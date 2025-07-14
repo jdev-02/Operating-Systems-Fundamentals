@@ -1,0 +1,26 @@
+Milestone 1
+
+D1 - For threadTrivialWorkload.py [4 pts]
+a) Based on an examination of the code available, what do you expect for relative runtime
+performance & output under each Python treading model?
+b) Run them once in each Python environment (3.13 & 3.13t); summarize their differences
+in output.
+c) Compare your expectations to the actual behaviors, explain any differences.
+d) Is the timing methodology adequate to make any statements about the results? Why or
+why not?
+
+D2 - For threadHeavyWorkload.py [4 pts]
+a) Based on an examination of the code available, what do you expect for relative runtime
+performance & output under each Python treading model?
+b) Run them, summarize their differences in output.
+c) Compare your expectations to the actual behaviors, explain any differences.
+d) Is the timing methodology adequate to make any statements about the results? Why or
+why not?
+
+D3 - With respect to D1 & D2 parts d) [8 pts]
+a) If there is a difference in answer between D1 and D2? Why
+b) If the answer is yes: What could be done to fix this?
+If the answer is no: Why is it not necessary to adjust?
+
+D4 - In a paragraph and/or a handful of bullet points, compare and contrast user and kernel
+threads providing an example problem for each where it is favored over the other. [4 pts]
