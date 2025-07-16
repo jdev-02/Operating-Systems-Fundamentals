@@ -1,17 +1,14 @@
-#
 # userThreadTest.py
 # CS3070 Synchronization Lab series
 #
 # created: Spring '16
 # updated: 10 Dec 2024
-#
 
 from multiprocessing import Queue  #https://docs.python.org/3.11/library/multiprocessing.html
 import os
 import time
 
 from support import SL_Thread
-
 
 def f(q, word):
     ''' An example function to call.
@@ -20,15 +17,11 @@ def f(q, word):
     q.put(word)
     print("in f(), pid =" + str( os.getpid() ) + '\n')
 
-
-
-
 ####################################
 ####################################
 ####################################
 #script starts here
 ##
-
 
 if __name__ == '__main__':
     q = Queue()
@@ -53,6 +46,3 @@ if __name__ == '__main__':
     print()
     
     print('processing took', (finish - start), 'sec')
-
-
-

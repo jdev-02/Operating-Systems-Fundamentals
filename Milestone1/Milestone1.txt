@@ -1,4 +1,7 @@
 Milestone 1
+Raajpaal Gohlwar (Capt - USMC)
+Jonathan Goohs (LT - USN)
+Tamarcus Norma (LT - USN)
 
 D1 - For threadTrivialWorkload.py [4 pts]
 a) Based on an examination of the code available, what do you expect for relative runtime
