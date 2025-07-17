@@ -5,16 +5,21 @@
 # updated: 10 Dec 2024
 
 from multiprocessing import Queue  #https://docs.python.org/3.11/library/multiprocessing.html
+#imports queue module for instantiation
 import os
+#imports os module
 import time
+#imports time module
 
 from support import SL_Thread
+
 
 def f(q, word):
     ''' An example function to call.
         -q is a multiprocessing.Queue object
         -word is a string '''
     q.put(word)
+    #puts the word into the queue
     print("in f(), pid =" + str( os.getpid() ) + '\n')
 
 ####################################
@@ -43,6 +48,7 @@ if __name__ == '__main__':
 
     while not q.empty():
         print(q.get(), ' ', end = '')
+        #takes the item from the queue
     print()
     
     print('processing took', (finish - start), 'sec')
