@@ -1,0 +1,90 @@
+Milestone 2
+Raajpaal Gohlwar (Capt - USMC)
+Jonathan Goohs (LT - USN)
+Tamarcus Norma (LT - USN)
+----------------------------------------------------------------------------------------------------
+D1 - Provide an annotated output of a run indicating the place(s) where you see evidence of improper
+results. [2 pts]
+// START OF OUTPUT
+
+Bob transaction for: 117, balance of: 2117 
+// Correct
+
+Alice balance inquiry: 2000 
+// Incorrect balance, should be 2117 since Bob deposited 117. Most likely lock issue with 
+ATMServer.py
+
+Alice transaction for: -54, balance of: 2063 
+// Correct
+
+Bob balance inquiry: 2063 
+// Correct
+
+Alice transaction for: 82, balance of: 2145 
+// Correct 
+
+Bob balance inquiry: 2145
+// Correct
+
+Alice balance inquiry: 2145
+// Correct
+
+Alice transaction for: 261, balance of: 2406
+// Correct
+
+Bob transaction for: 233, balance of: 2378
+// Incorrect balance, should be 2639. Most likely lock issue with ATMServer.py
+
+Alice transaction for: 263, balance of: 2641
+// Correct
+
+Bob transaction for: 160, balance of: 2538
+// Incorrect balance, should be 2801. Most likely lock issue with ATMServer.py
+
+Bob transaction for: 51, balance of: 2589
+// Incorrect balance
+
+Bob transaction for: -4, balance of: 2585
+// Incorrect balance
+
+Alice transaction for: -31, balance of: 2558
+
+Bob balance inquiry: 2558
+
+Bob transaction for: 171, balance of: 2729
+
+Alice transaction for: 296, balance of: 2854
+
+Alice balance inquiry: 2854
+
+Bob transaction for: -225, balance of: 2629
+
+Alice transaction for: 219, balance of: 2848
+
+Bob transaction for: -269, balance of: 2579
+
+Alice balance inquiry: 2579
+   ATMServer Bob shut down
+
+Bob transaction for: 137, balance of: 2716
+   ATM machine Bob shutting down; transaction total was: 371
+
+Alice transaction for: 2, balance of: 2581
+   ATMServer Alice shut down
+   ATM machine Alice shutting down; transaction total was: 1038
+
+Final account total is 2581
+
+Done with ATMs!
+// END OF OUTPUT
+----------------------------------------------------------------------------------------------------
+D2 - In isolation, for a single customer at a time. [4 pts]
+a) Is the Transaction Protocol from the above figure correct?
+b) Justify
+----------------------------------------------------------------------------------------------------
+D3 - With respect to D1 & D2 parts d) [8 pts]
+
+a) What do you believe the problem is?
+b) Where in the system is the problem manifested? Be specific down to lines of code and the simulat-
+ion action relationships you identify as direct contributors.
+----------------------------------------------------------------------------------------------------
