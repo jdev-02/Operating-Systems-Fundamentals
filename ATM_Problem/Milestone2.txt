@@ -11,8 +11,7 @@ Bob transaction for: 117, balance of: 2117
 // Correct
 
 Alice balance inquiry: 2000 
-// Incorrect balance, should be 2117 since Bob deposited 117. Most likely lock issue with 
-ATMServer.py
+// Incorrect balance, should be 2117 since Bob deposited 117. 
 
 Alice transaction for: -54, balance of: 2063 
 // Correct
@@ -33,53 +32,69 @@ Alice transaction for: 261, balance of: 2406
 // Correct
 
 Bob transaction for: 233, balance of: 2378
-// Incorrect balance, should be 2639. Most likely lock issue with ATMServer.py
+// Incorrect balance, should be 2639. 
 
 Alice transaction for: 263, balance of: 2641
-// Correct
+// Incorrect balance, should be 2902.
 
 Bob transaction for: 160, balance of: 2538
-// Incorrect balance, should be 2801. Most likely lock issue with ATMServer.py
+// Incorrect balance, should be 3062. 
 
 Bob transaction for: 51, balance of: 2589
-// Incorrect balance
+// Incorrect balance, should be 3113.
 
 Bob transaction for: -4, balance of: 2585
-// Incorrect balance
+// Incorrect balance, should be 3109.
 
 Alice transaction for: -31, balance of: 2558
+// Incorrect balance, should be 3078.
 
 Bob balance inquiry: 2558
+// Incorrect balance, should be 3078.
 
 Bob transaction for: 171, balance of: 2729
+// Incorrect balance, should be 3249.
 
 Alice transaction for: 296, balance of: 2854
+// Incorrect balance, should be 3545.
 
 Alice balance inquiry: 2854
+// Incorrect balance, should be 3545.
 
 Bob transaction for: -225, balance of: 2629
+// Incorrect balance, should be 3320.
 
 Alice transaction for: 219, balance of: 2848
+// Incorrect balance, should be 3539.
 
 Bob transaction for: -269, balance of: 2579
+// Incorrect balance, should be 3270.
 
 Alice balance inquiry: 2579
    ATMServer Bob shut down
+// Incorrect balance, should be 3270.
 
 Bob transaction for: 137, balance of: 2716
    ATM machine Bob shutting down; transaction total was: 371
+// Incorrect balance, should be 3407.
 
 Alice transaction for: 2, balance of: 2581
    ATMServer Alice shut down
    ATM machine Alice shutting down; transaction total was: 1038
+// Incorrect balance, should be 3409.
 
 Final account total is 2581
+// Incorrect balance, should be 3407.
 
 Done with ATMs!
 // END OF OUTPUT
 ----------------------------------------------------------------------------------------------------
 D2 - In isolation, for a single customer at a time. [4 pts]
 a) Is the Transaction Protocol from the above figure correct?
+The Transaction Protocol depicted in the message is not a correct implementation of accessing a 
+shared resource. When the customer attempts to access the ATM balance, there are no locks in place
+preventing 
+
 b) Justify
 ----------------------------------------------------------------------------------------------------
 D3 - With respect to D1 & D2 parts d) [8 pts]
