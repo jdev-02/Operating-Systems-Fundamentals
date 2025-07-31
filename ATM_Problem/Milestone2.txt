@@ -93,20 +93,12 @@ D2 - In isolation, for a single customer at a time. [4 pts]
 a) Is the Transaction Protocol from the above figure correct?
 The Transaction Protocol depicted in the figure above is not a correct, even when examining the 
 transactions for a single customer at a time.
+
 b) Justify
-The protocol is flawed due to inconsistencies in both the reported transaction totals and the final
-account balance for Bob and potentially for Alice.
-
-Alice: Earlier transactions are missing from the message output. Due to this, we cannot conclusively
-verify whether her reported transaction total of -440 is accurate. It's impossible to determine
-the validity of the transcation total without being provided the starting balance.
-
-Bob: In insolation, Bob's transaction protocol is definitively incorrect. 232 - 3 - 219 - 193 = -183 
-, but the system reports his transaction total as -13. This mismatch suggests that the system is 
-either logging transactions incorrectly, miscalculating the customer totals, or concurrency issues
-are overwriting the data. A race condition involving the shared resource could be the cause of any
-of these issues. Proper synchronization mechanisms would ensure that correct balances and transaction
-totals are displayed.
+The issue with the figure lies primarily with the Transaction Protocol. We notice that a customer is
+able to create and send a GET_BALANCE message as well as execute a PUT_BALANCE message with no 
+concern over who else is trying to modify the data. The problem is that both of these messages 
+attempt to access the shared resource of the ATM balance in memory. 
 ----------------------------------------------------------------------------------------------------
 D3 - With respect to D1 & D2 parts d) [8 pts]
 
