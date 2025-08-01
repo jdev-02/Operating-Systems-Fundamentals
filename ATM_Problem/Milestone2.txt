@@ -106,8 +106,13 @@ D3 - With respect to D1 & D2 parts d) [8 pts]
 a) What do you believe the problem is?
 The problem is that Alice and Bob are attempting to access the bank memory at the same, as well as 
 execute commands that modify the data located in memory. Since there is no queue to manage the 
-customers attempting to access the shared resource,
+customers attempting to access the shared resource, we run into race conditions where one customer
+can read data that is in the process of being modified.
 
 b) Where in the system is the problem manifested? Be specific down to lines of code and the simulat-
 ion action relationships you identify as direct contributors.
+In the file ATMServer.py, regarding getBalance() and putBalance() (lines 92-98), both methods do not have a stop 
+in place before accessing the shared resource of the 'CS3070_account' they were initialized with.
+Since this is a shared account, there needs to be some check in place within those respective 
+methods to ensure the resource is free and available for access (read or write).
 ----------------------------------------------------------------------------------------------------
