@@ -91,28 +91,50 @@ Done with ATMs!
 ----------------------------------------------------------------------------------------------------
 D2 - In isolation, for a single customer at a time. [4 pts]
 a) Is the Transaction Protocol from the above figure correct?
-The Transaction Protocol depicted in the figure above is not a correct, even when examining the 
-transactions for a single customer at a time.
+Bob transaction for: 17, balance of: 2017
+Bob transaction for: -129, balance of: 1888
+Bob transaction for: 11, balance of: 1899
+Bob transaction for: 202, balance of: 2101
+Bob transaction for: 299, balance of: 2400
+Bob transaction for: 115, balance of: 2515
+Bob transaction for: -53, balance of: 2462
+Bob transaction for: -71, balance of: 2391
+Bob transaction for: 25, balance of: 2416
+Bob transaction for: 274, balance of: 2690
+   ATM machine Bob shutting down; transaction total was: 690
+
+Yes, in isolation single customer iterations of the code run without issues, suggesting there are issues with parallelism.
 
 b) Justify
-The issue with the figure lies primarily with the Transaction Protocol. We notice that a customer is
-able to create and send a GET_BALANCE message as well as execute a PUT_BALANCE message with no 
-concern over who else is trying to modify the data. The problem is that both of these messages 
-attempt to access the shared resource of the ATM balance in memory. There needs to be a mechanism
-in place that prevents such race conditions.
+The transaction protocol, as implicitly depicted in Parallelism.pdf and implemented in the ATM client, involves a sequence of steps:
+1. Get Balance: Retrieve the current account balance from the bank database.
+2. Modify Locally: Add or subtract the transaction amount to/from the retrieved balance.
+3. Put Balance: Write the new calculated balance back to the bank database.
+
+When only a single customer (process) is accessing the account, there is no other process that can interfere with this sequence of operations. The "step-by-step behavior" and "one thing at a time" nature of sequential processes would ensure that the balance retrieved is always the most current, the calculation is performed without interruption, and the result is written back without being overwritten by a concurrent operation. In this scenario, the full transaction as described above as an indivisible action. The issue of "race conditions," where the output depends on the speeds or interleaving of parallel paths, does not arise because there is no parallelism involving shared resources.
 ----------------------------------------------------------------------------------------------------
 D3 - With respect to D1 & D2 parts d) [8 pts]
 
 a) What do you believe the problem is?
-The problem is that Alice and Bob are attempting to access the bank memory at the same, as well as 
-execute commands that modify the data located in memory. Since there is no queue to manage the 
-customers attempting to access the shared resource, we run into race conditions where one customer
-can read data that is in the process of being modified.
+We believe the fundamental problem is a race condition caused by the lack of mutual exclusion during the critical section of the read-modify-write cycle transaction acting on the account balance. The system allows multiple concurrent processes (ATM clients and their associated ATM servers) to access and modify the same shared account data without adequately ensuring that each complete transaction (getting the balance, modifying it, and putting it back) occurs in proper succession. As a result, operations from different clients can interleave, leading to lost updates and an inconsistent final balance as we see in the above output of the script.
 
 b) Where in the system is the problem manifested? Be specific down to lines of code and the simulat-
 ion action relationships you identify as direct contributors.
-In the file ATMServer.py, regarding getBalance() and putBalance() (lines 92-98), both methods do not have a stop 
-in place before accessing the shared resource of the 'CS3070_account' they were initialized with.
-Since this is a shared account, there needs to be some check in place within those respective 
-methods to ensure the resource is free and available for access (read or write).
-----------------------------------------------------------------------------------------------------
+
+
+The problem is manifested across both the ATM client (ATM.py) and the ATM server (ATMServer.py), due to their interaction and the server's lack of proper synchronization for multi-step transactions. The simulation action relationships directly highlight these issues through observable incorrect balances.
+
+In ATM.py (ATM Client): The problem begins with the client's transactional sequence, which involves multiple steps that are not treated as a single operations by the server. Each ATM client performs a transaction by:
+    Sending a GET_BALANCE request.
+    Receiving the current balance from the server.
+    Calculating the new balance locally (e.g., balance += transactionAmount). This creates a local copy of the balance that can become stale if another transaction modifies the actual balance on the server.
+    Sending a PUT_BALANCE request with the updated balance. This separation of the "read" (GET_BALANCE) and "write" (PUT_BALANCE) operations, with a local modification in between, creates the window for a race condition.
+In ATMServer.py (ATM Server): The server's design for handling these requests is where the race condition becomes critical.
+	The server handles GET_BALANCE and PUT_BALANCE as two entirely separate and independent operations within its execute method.
+        ▪ GET_BALANCE calls self.OS.read(self.account) via getBalance().
+        ▪ PUT_BALANCE calls self.OS.write(self.account, newBalance) via putBalance().
+	There is no synchronization between these two operations (the GET_BALANCE and subsequent PUT_BALANCE for a single client's transaction). This means that after one ATM client sends a GET_BALANCE request and before it sends its corresponding PUT_BALANCE request, other ATM servers (representing other clients like Alice or Bob) can interleave their own GET/PUT operations on the same shared account data. 
+	If two ATMs (in this code Alice and Bob) read the balance at approximately the same time, both will see the same initial value. Each then calculates a new balance locally and sends a PUT_BALANCE request. However, the second PUT_BALANCE operation to reach the server will overwrite the first, causing one of the transactions to be lost, which we see in the initial output above.
+
+
+---------------------------------------------------------------EOF-------------------------------------------------

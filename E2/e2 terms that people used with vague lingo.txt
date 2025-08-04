@@ -1,0 +1,13 @@
+re-entrant interrupt handling
+incorrect vector resolution
+control integrity of the dispatching process
+system integrity
+privilege separation
+process of vector lookup
+preemptive multitasking
+rogue process
+attack surface
+address tampering
+address injection
+atomic privilege transition
+user overwrite kernel memory with malware

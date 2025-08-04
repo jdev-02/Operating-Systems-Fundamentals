@@ -39,30 +39,33 @@ if __name__ == '__main__':
 
     #prep ATMServers
     #Servers are independent programs running on same simulated hardware
-    P1 = ATMServer('Alice', 'P1',   randomSeed, accountName, transactionLimit, semInit, OS.SIM_SETUP_simArgs(), alice_atmServer_client_conn, alice_kernel_conn) 
+    #P1 = ATMServer('Alice', 'P1',   randomSeed, accountName, transactionLimit, semInit, OS.SIM_SETUP_simArgs(), alice_atmServer_client_conn, alice_kernel_conn) 
     P2 = ATMServer(  'Bob', 'P2', randomSeed+1, accountName, transactionLimit, semInit, OS.SIM_SETUP_simArgs(),   bob_atmServer_client_conn, bob_kernel_conn)
-    OS.SIM_SETUP_addToProcessTable('P1', P1)
+    #OS.SIM_SETUP_addToProcessTable('P1', P1)
     OS.SIM_SETUP_addToProcessTable('P2', P2)
 
     #prep ATMs, ATMs are independent programs running on simulated independent hardware
-    P3 = ATM('Alice', 'P3', randomSeed+2, alice_atm_conn)
+    #P3 = ATM('Alice', 'P3', randomSeed+2, alice_atm_conn)
     P4 = ATM(  'Bob', 'P4', randomSeed+3,   bob_atm_conn)
-    OS.SIM_SETUP_addToProcessTable('P3', P3)
+    #OS.SIM_SETUP_addToProcessTable('P3', P3)
     OS.SIM_SETUP_addToProcessTable('P4', P4)
 
 
+    
     #boot up ATMServers/ATMs
-    P1.start()
+    #P1.start()
     P2.start()
-    P3.start()
+    #P3.start()
     P4.start()
 
     OS.runServices()
 
+    
+
     #clean shutdown
-    P1.join()
+    #P1.join()
     P2.join()
-    P3.join()
+    #P3.join()
     P4.join()
 
 
