@@ -8,9 +8,6 @@ Updated: 13 Jan 2022
 
 '''This is the Semaphore implementation class.'''
 
-import SL_Kernel as Kernel
-# import UserProcess as UP
-
 class Semaphore(object):
 ##########################################
 #Constructor
@@ -25,8 +22,8 @@ class Semaphore(object):
         
         self.OS = simKernel
         self.counter = 1 # Assign counter initial value of 1 (lock is open)
-        self.userQueue = Kernel.getQueue() # Create queue
-        self.lock = Kernel.OS.getAtomicLock() # Create lock
+        self.userQueue = self.OS.getQueue() # Create queue
+        self.lock = self.OS.getAtomicLock() # Create lock
         
 ##########################################
 #Instance Methods
@@ -42,19 +39,14 @@ class Semaphore(object):
             3. Assign value of 0 to semaphore counter variable
          
         '''
-
-        if (self.counter == 1):
-            # Decrement counter
-            self.counter -= 1
+        while (self.counter == 1):
+                # Decrement counter
             self.lock.acquire(caller)
-            # Execute critical section
-        else:
-            # Place waiting process in queue, go to sleep
-            self.userQueue.put(caller)
-            caller.sleep()
-
-        while (self.counter < 1):
-            abc
+            self.counter -= 1
+             # Execute critical section
+        # Place waiting process in queue, go to sleep
+        self.userQueue.put(caller)
+        caller.sleep()
         
 
     def signal(self, caller):
@@ -69,8 +61,19 @@ class Semaphore(object):
             increment counter back to 1
         '''
         # Get next man up
-        Kernel.OS.wake(Kernel.queue.get())
-
+        nextman = self.OS.wake(self.OS.queue.get())
+        if (self.counter != 1 and self.userQueue.get() != ""):
+            self.lock.release(caller)
+            self.counter += 1
+            if (self.userQueue.get() != ""):
+                self.wait(nextman)
+            #now next man can enter since the counter is 1
+        
+        if (self.userQueue.get() == ""):
+            #theres no processes in the queue
+            self.lock.release(caller)
+            self.counter += 1
+        
 '''
 1. User: construct GET_BALANCE msg -> msg(dollar_amount)
 2. GOTO: WAIT(semaphore) -> decrement
