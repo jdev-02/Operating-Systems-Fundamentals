@@ -21,9 +21,9 @@ class Semaphore(object):
         '''
         
         self.OS = simKernel
-        self.counter = 1 # Assign counter initial value of 1 (lock is open)
-        self.queue = [] # Create queue
-        self.lock = self.OS.getAtomicLock() # Create lock
+        self.counter = 1 #Assign counter initial value of 1 (lock is open)
+        self.queue = [] #create abstract queue
+        self.lock = self.OS.getAtomicLock() #create lock
         
 ##########################################
 #Instance Methods
@@ -35,11 +35,12 @@ class Semaphore(object):
                a production OS has this info available as part of the PCB)
         '''
         if (self.counter == 1):
-            # Lock is open
+            #lock is open
             self.lock.acquire(caller)
-            self.counter == 0
+            #caller gets atom lock
+            self.counter = 0
         elif (self.counter == 0):
-            # Place waiting process in queue, go to sleep
+            #place waiting process in queue bc resource is locked, go to sleep
             self.queue.append(caller)
             caller.sleep()
             
@@ -49,11 +50,14 @@ class Semaphore(object):
               (you will need caller because this is a simulated system,
                a production OS has this info available as part of the PCB)
         '''
-        # Release lock from current process
+        #release lock from current process
         self.lock.release(caller)
         if len(self.queue) > 0:
-            # Get next man up
+            #get next man up
             nextMan = self.queue.pop(0)
             self.OS.wake(nextMan)
         else:
-            self.counter = 1
+            self.counter = 1 
+            #resource is free to be grabbed by an incoming process since nothing is in the queue waiting
+
+#EOF
