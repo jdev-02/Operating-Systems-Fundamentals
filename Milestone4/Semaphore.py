@@ -39,16 +39,22 @@ class Semaphore(object):
             3. Assign value of 0 to semaphore counter variable
          
         '''
-        while (self.counter == 1):
-                # Decrement counter
-            self.lock.acquire(caller)
-            self.counter -= 1
-             # Execute critical section
-        # Place waiting process in queue, go to sleep
-        self.userQueue.put(caller)
-        caller.sleep()
-        
-
+        if (self.counter == 1):
+            # Decrement counter
+            print("I am first inline")
+            #self.lock.acquire(caller)
+            self.counter == 0
+            print(self.counter)
+            # Execute critical section
+        elif (self.counter == 0):
+            # Place waiting process in queue, go to sleep
+            print("I am going in the queue")
+            #self.counter -= 1
+            print(self.counter)
+            self.userQueue.put(caller)
+            caller.sleep()
+            print(self.userQueue)
+            
     def signal(self, caller):
         ''' semaphore signal functionality.
             - caller is the process providing the "signal"
@@ -61,28 +67,18 @@ class Semaphore(object):
             increment counter back to 1
         '''
         # Get next man up
-        nextman = self.OS.wake(self.OS.queue.get())
-        if (self.counter != 1 and self.userQueue.get() != ""):
-            self.lock.release(caller)
+        print("I am now in signal")
+        if (self.userQueue.empty()):
+            self.counter = 1
+        else:
+            self.OS.wake(self.userQueue.get())
+
+        '''
+        if (self.counter == 0):
+            #self.lock.release(caller)
             self.counter += 1
-            if (self.userQueue.get() != ""):
-                self.wait(nextman)
+            print(self.counter)
+            self.OS.wake(self.userQueue.get())
+            #self.wait(nextman)
             #now next man can enter since the counter is 1
-        
-        if (self.userQueue.get() == ""):
-            #theres no processes in the queue
-            self.lock.release(caller)
-            self.counter += 1
-        
-'''
-1. User: construct GET_BALANCE msg -> msg(dollar_amount)
-2. GOTO: WAIT(semaphore) -> decrement
-    3. Send GET_BALANCE msg
-    4. Receive msg
-    5. Extract balance from msg
-    6. Construct new balance
-    7. Construct PUT_BALANCE msg
-    8. Send PUT_BALANCE msg
-    9. SIGNAL(semaphore) -> increment
-10. Loop
-'''
+        '''
