@@ -7,7 +7,6 @@ Updated: 13 Jan 2022
 '''
 
 '''This is the Semaphore implementation class.'''
-import multiprocessing as mp
 
 class Semaphore(object):
 ##########################################
@@ -21,8 +20,9 @@ class Semaphore(object):
             This constructor will run once when the OS invokes it.
         '''
 
-        self.OS = simKernel        
-        self.counter = mp.Value('i',n).value
+        self.OS = simKernel
+        self.n = n
+        self.OS.write("accountName", n) #assigned with value of 1 as init val         
         self.queue = self.OS.getQueue() #create abstract queue
         self.lock = self.OS.getAtomicLock() #create lock
         
@@ -37,18 +37,26 @@ class Semaphore(object):
                
         '''
         self.lock.acquire(caller)
-        if (self.counter > 0):
-            #lock is open
-            self.counter -= 1
+        # Raaj: No need to write to counter value now, can wait until in critical section of wait()
+        #self.OS.write("accountName",self.n-1)
+        #feedback from the 1400 on 11 SEP collab - decrement nd check the value before going into the logic, then write to it
+
+        # Assign current counter value to local copy
+        counter_state = self.OS.read("accountName") #read from shared memory
+        #print(counter_state)
+
+        #change to follow the algo from the proof
+        if (counter_state == 1):
+            # Lock is open (counter_state == 1) -> Decrement counter, write to shared memory location and release lock
+            counter_state -= 1
+            self.OS.write("accountName", counter_state)
             self.lock.release(caller)
-        elif (self.counter == 0):
-            #place waiting process in queue bc resource is locked, go to sleep
-            self.queue.put(caller)
+        elif (counter_state == 0):
+            # Critical section occupied -> Place in queue, release lock and sleep
+            #print("I am entering the queue")
+            self.queue.put(caller.getName())
             self.lock.release(caller)
             caller.sleep()
-        else:
-            self.lock.release(caller)
-
             
     def signal(self, caller):
         ''' semaphore signal functionality.
@@ -56,17 +64,31 @@ class Semaphore(object):
               (you will need caller because this is a simulated system,
                a production OS has this info available as part of the PCB)
         '''
-        #release lock from current process
-        self.lock.acquire(caller)
-        if self.queue.empty() != True:
-            #get next man up
-            nextMan = self.queue.get()
-            self.OS.wake(nextMan)
-            self.counter += 1
-            self.lock.release(caller)
-        else: #queue empty
-            self.counter += 1 
-            self.lock.release(caller)
-            #resource is free to be grabbed by an incoming process since nothing is in the queue waiting
+        # Raaj: We need to mirror wait() ->
+            # 1. Acquire lock
+            # 2. Assign value of our shared memory counter to local variable
+            # 3. Enter if/else section
 
+        # Acquire lock
+        self.lock.acquire(caller)
+
+        # Assign current counter value to local copy, different scope than wait() so we can re-use
+        counter_state = self.OS.read("accountName") #read from shared memory
+
+        if not self.queue.empty():
+            # Get next man from queue, do not modify counter variable since it remains 0
+            nextMan = self.queue.get()
+            #print("I am exiting the queue")
+            self.OS.wake(nextMan)
+
+            # Prevent race condition of two processes in deadlock
+            caller.slp_yield() 
+        else: # Queue empty
+            counter_state = self.OS.read("accountName") #read from shared memory
+            # I am not sure we need this new variable new_val since counter_state scope is only in signal
+            #new_val = counter_state + 1
+            counter_state += 1
+            self.OS.write("accountName", counter_state) 
+        self.lock.release(caller)
+            #resource is free to be grabbed by an incoming process since nothing is in the queue waiting
 #EOF
