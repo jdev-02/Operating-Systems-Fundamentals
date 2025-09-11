@@ -1,0 +1,9 @@
+[submodule "big_project/external/imgui"]
+	path = big_project/external/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "big_project/external/implot"]
+	path = big_project/external/implot
+	url = https://github.com/epezent/implot.git
+[submodule "big_project/external/glfw"]
+	path = big_project/external/glfw
+	url = https://github.com/glfw/glfw.git
