@@ -38,25 +38,30 @@ class Semaphore(object):
         '''
         self.lock.acquire(caller)
         # Raaj: No need to write to counter value now, can wait until in critical section of wait()
-        #self.OS.write("accountName",self.n-1)
+        self.OS.write("accountName",self.n-1)
         #feedback from the 1400 on 11 SEP collab - decrement nd check the value before going into the logic, then write to it
 
         # Assign current counter value to local copy
         counter_state = self.OS.read("accountName") #read from shared memory
         #print(counter_state)
-
-        #change to follow the algo from the proof
-        if (counter_state == 1):
-            # Lock is open (counter_state == 1) -> Decrement counter, write to shared memory location and release lock
-            counter_state -= 1
-            self.OS.write("accountName", counter_state)
-            self.lock.release(caller)
-        elif (counter_state == 0):
-            # Critical section occupied -> Place in queue, release lock and sleep
-            #print("I am entering the queue")
+        if (counter_state < 0):
             self.queue.put(caller.getName())
             self.lock.release(caller)
             caller.sleep()
+        else:
+            self.lock.release(caller)
+        #change to follow the algo from the proof
+        #if (counter_state == 1):
+            # Lock is open (counter_state == 1) -> Decrement counter, write to shared memory location and release lock
+        #    counter_state -= 1
+        #    self.OS.write("accountName", counter_state)
+        #    self.lock.release(caller)
+        #elif (counter_state == 0):
+            # Critical section occupied -> Place in queue, release lock and sleep
+            #print("I am entering the queue")
+        #    self.queue.put(caller.getName())
+        #    self.lock.release(caller)
+        #    caller.sleep()
             
     def signal(self, caller):
         ''' semaphore signal functionality.
@@ -71,11 +76,11 @@ class Semaphore(object):
 
         # Acquire lock
         self.lock.acquire(caller)
-
+        self.OS.write("accountName",self.n+1)
         # Assign current counter value to local copy, different scope than wait() so we can re-use
         counter_state = self.OS.read("accountName") #read from shared memory
 
-        if not self.queue.empty():
+        if counter_state <= 0:
             # Get next man from queue, do not modify counter variable since it remains 0
             nextMan = self.queue.get()
             #print("I am exiting the queue")
@@ -83,12 +88,13 @@ class Semaphore(object):
 
             # Prevent race condition of two processes in deadlock
             caller.slp_yield() 
-        else: # Queue empty
-            counter_state = self.OS.read("accountName") #read from shared memory
+        self.lock.release(caller)
+        #else: # Queue empty
+        #    counter_state = self.OS.read("accountName") #read from shared memory
             # I am not sure we need this new variable new_val since counter_state scope is only in signal
             #new_val = counter_state + 1
-            counter_state += 1
-            self.OS.write("accountName", counter_state) 
-        self.lock.release(caller)
+        #    counter_state += 1
+        #    self.OS.write("accountName", counter_state) 
+        #self.lock.release(caller)
             #resource is free to be grabbed by an incoming process since nothing is in the queue waiting
 #EOF
