@@ -36,21 +36,24 @@ class Semaphore(object):
                a production OS has this info available as part of the PCB)                 
                
         '''
+        # Acquire lock
         self.lock.acquire(caller)
-        # Raaj: No need to write to counter value now, can wait until in critical section of wait()
-        self.OS.write("accountName",self.n-1)
-        #feedback from the 1400 on 11 SEP collab - decrement nd check the value before going into the logic, then write to it
+
+        # Decrement counter
+        self.OS.write("accountName",self.n - 1)
 
         # Assign current counter value to local copy
         counter_state = self.OS.read("accountName") #read from shared memory
         #print(counter_state)
+        
         if (counter_state < 0):
             self.queue.put(caller.getName())
             self.lock.release(caller)
             caller.sleep()
         else:
             self.lock.release(caller)
-        #change to follow the algo from the proof
+
+        # Raaj Version
         #if (counter_state == 1):
             # Lock is open (counter_state == 1) -> Decrement counter, write to shared memory location and release lock
         #    counter_state -= 1
@@ -76,7 +79,10 @@ class Semaphore(object):
 
         # Acquire lock
         self.lock.acquire(caller)
+
+        # Increment counter
         self.OS.write("accountName",self.n+1)
+
         # Assign current counter value to local copy, different scope than wait() so we can re-use
         counter_state = self.OS.read("accountName") #read from shared memory
 
@@ -88,7 +94,10 @@ class Semaphore(object):
 
             # Prevent race condition of two processes in deadlock
             caller.slp_yield() 
+
         self.lock.release(caller)
+
+        # Raaj Version
         #else: # Queue empty
         #    counter_state = self.OS.read("accountName") #read from shared memory
             # I am not sure we need this new variable new_val since counter_state scope is only in signal
