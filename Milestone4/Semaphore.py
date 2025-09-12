@@ -21,10 +21,12 @@ class Semaphore(object):
         '''
 
         self.OS = simKernel
-        self.n = n
-        self.OS.write("accountName", n) #assigned with value of 1 as init val         
-        self.queue = self.OS.getQueue() #create abstract queue
-        self.lock = self.OS.getAtomicLock() #create lock
+        # Create counter (located in shared memory) with init value n
+        self.OS.write("accountName", n)     
+        # Create queue to store processes 
+        self.queue = self.OS.getQueue() 
+        # Create lock
+        self.lock = self.OS.getAtomicLock() 
         
 ##########################################
 #Instance Methods
@@ -39,18 +41,21 @@ class Semaphore(object):
         # Acquire lock
         self.lock.acquire(caller)
 
-        # Decrement counter
-        self.OS.write("accountName",self.n - 1)
-
+        # Raaj Updates 12 Sep @ 1100
         # Assign current counter value to local copy
-        counter_state = self.OS.read("accountName") #read from shared memory
-        #print(counter_state)
+        counter_state = self.OS.read("accountName")
+        # Decrement counter
+        counter_state -= 1
+        # Write to shared memory
+        self.OS.write("accountName", counter_state)
         
         if (counter_state < 0):
+            # Critical section in use, need to enter queue
             self.queue.put(caller.getName())
             self.lock.release(caller)
             caller.sleep()
         else:
+            # Critical section open
             self.lock.release(caller)
 
         # Raaj Version
@@ -72,29 +77,27 @@ class Semaphore(object):
               (you will need caller because this is a simulated system,
                a production OS has this info available as part of the PCB)
         '''
-        # Raaj: We need to mirror wait() ->
-            # 1. Acquire lock
-            # 2. Assign value of our shared memory counter to local variable
-            # 3. Enter if/else section
 
         # Acquire lock
         self.lock.acquire(caller)
 
+        # Raaj Updates 12 Sep @ 1100
+        # Assign current counter value to local copy
+        counter_state = self.OS.read("accountName")
         # Increment counter
-        self.OS.write("accountName",self.n+1)
-
-        # Assign current counter value to local copy, different scope than wait() so we can re-use
-        counter_state = self.OS.read("accountName") #read from shared memory
+        counter_state += 1
+        # Write to shared memory
+        self.OS.write("accountName", counter_state)
 
         if counter_state <= 0:
             # Get next man from queue, do not modify counter variable since it remains 0
             nextMan = self.queue.get()
-            #print("I am exiting the queue")
             self.OS.wake(nextMan)
 
             # Prevent race condition of two processes in deadlock
             caller.slp_yield() 
 
+        # Release lock
         self.lock.release(caller)
 
         # Raaj Version
