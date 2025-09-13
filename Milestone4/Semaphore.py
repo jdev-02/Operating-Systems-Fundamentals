@@ -19,7 +19,7 @@ class Semaphore(object):
                  would have when constructing a Semaphore
             This constructor will run once when the OS invokes it.
         '''
-
+        
         self.OS = simKernel
         # Create counter (located in shared memory) with init value n
         self.OS.write("accountName", n)     
@@ -41,7 +41,6 @@ class Semaphore(object):
         # Acquire lock
         self.lock.acquire(caller)
 
-        # Raaj Updates 12 Sep @ 1100
         # Assign current counter value to local copy
         counter_state = self.OS.read("accountName")
         # Decrement counter
@@ -57,19 +56,6 @@ class Semaphore(object):
         else:
             # Critical section open
             self.lock.release(caller)
-
-        # Raaj Version
-        #if (counter_state == 1):
-            # Lock is open (counter_state == 1) -> Decrement counter, write to shared memory location and release lock
-        #    counter_state -= 1
-        #    self.OS.write("accountName", counter_state)
-        #    self.lock.release(caller)
-        #elif (counter_state == 0):
-            # Critical section occupied -> Place in queue, release lock and sleep
-            #print("I am entering the queue")
-        #    self.queue.put(caller.getName())
-        #    self.lock.release(caller)
-        #    caller.sleep()
             
     def signal(self, caller):
         ''' semaphore signal functionality.
@@ -81,7 +67,6 @@ class Semaphore(object):
         # Acquire lock
         self.lock.acquire(caller)
 
-        # Raaj Updates 12 Sep @ 1100
         # Assign current counter value to local copy
         counter_state = self.OS.read("accountName")
         # Increment counter
@@ -99,14 +84,4 @@ class Semaphore(object):
 
         # Release lock
         self.lock.release(caller)
-
-        # Raaj Version
-        #else: # Queue empty
-        #    counter_state = self.OS.read("accountName") #read from shared memory
-            # I am not sure we need this new variable new_val since counter_state scope is only in signal
-            #new_val = counter_state + 1
-        #    counter_state += 1
-        #    self.OS.write("accountName", counter_state) 
-        #self.lock.release(caller)
-            #resource is free to be grabbed by an incoming process since nothing is in the queue waiting
 #EOF
