@@ -7,12 +7,12 @@ Updated: 13 Jan 2022
 '''
 
 import multiprocessing as mp
-
 import SL_Kernel as Kernel
 
 from ATMMessage import *
 from ATMServer import *
 from ATM import *
+from Semaphore import *
 
 if __name__ == '__main__':
 
@@ -55,6 +55,16 @@ if __name__ == '__main__':
     P4.start()
 
     OS.runServices()
+
+    # 1. sendmsg(acct#)
+    #message = ATMMessage.wrap(operation, amount)
+    #mySem = Semaphore(n, OS)
+    #operation, amount = ATMMessage.unwrap(message)
+
+    # 2. updatestuffinsharedresource(acct#)
+
+    # 3. sendmsgback(acct#)
+    
 
     #clean shutdown
     P1.join()

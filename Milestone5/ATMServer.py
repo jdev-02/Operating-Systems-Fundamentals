@@ -74,13 +74,21 @@ class ATMServer(mp.Process):
             (operation, amount) = ATMMessage.unwrap(message)
 
             if operation == PUT_BALANCE:
-                self.putBalance(amount)
+                self.semaphore.wait(self) # Update
+                try:
+                    self.putBalance(amount)
+                # write shared state
+                finally:
+                    self.semaphore.signal(self) # Update 
                 
             elif operation == GET_BALANCE:
-                amount = self.getBalance()
+                self.semaphore.wait(self) # Update
+                try:
+                    amount = self.getBalance()
+                finally:
+                    self.semaphore.signal(self) # Update
                 msg = ATMMessage.wrap(BALANCE, amount)
                 self.atm_connection.send(msg)
-                
             else:
                 raise RuntimeError(operation + 'is an unrecognized account operation')
        
@@ -92,10 +100,8 @@ class ATMServer(mp.Process):
     def getBalance(self):
         return self.OS.read(self.account)
 
-
     def putBalance(self, newBalance):
         self.OS.write(self.account, newBalance)
-
 
     def __initializeSimComponents(self, q, al):
         self.OS.SIM_SETUP_setUpKernel(q, al, self.name)
