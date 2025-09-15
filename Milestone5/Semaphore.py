@@ -38,10 +38,10 @@ class Semaphore(object):
                a production OS has this info available as part of the PCB)                 
                
         '''
+
         # Acquire lock
         self.lock.acquire(caller)
-        print("Lock acquired")
-
+        
         # Assign current counter value to local copy
         counter_state = self.OS.read("accountName")
         # Decrement counter
