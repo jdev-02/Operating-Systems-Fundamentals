@@ -56,17 +56,6 @@ if __name__ == '__main__':
 
     OS.runServices()
 
-    # 1. sendmsg(acct#)
-    #message = ATMMessage.wrap(operation, amount)
-    #mySem = Semaphore(n, OS)
-    #operation, amount = ATMMessage.unwrap(message)
-    # From either P3 or P4 to P1 or P2 -> msg(amount)
-
-    # 2. updatestuffinsharedresource(acct#)
-
-    # 3. sendmsgback(acct#)
-    
-
     #clean shutdown
     P1.join()
     P2.join()

@@ -55,35 +55,36 @@ class ATM(mp.Process):
             transactionAmount = int( random.random() * 300)
 
             pull = random.random()
-            if pull < 0.2:     #check balance
-                self.atm_connection.send( ATMMessage.wrap(GET_BALANCE, 0) )
+
+            # Check balance
+            if pull < 0.2: 
+                self.atm_connection.send(ATMMessage.wrap(GET_BALANCE, 0))
                 balance = self.__recieveBalance__()
                 if balance == SHUTDOWN:
                     break
                 print ( self.clientName + ' balance inquiry: ' + str(balance) + '\n', end = ''  )
 
             else:
-                if pull < 0.6:   #withdrawal
+                # Transact (withdraw)
+                if pull < 0.6:   
                     transactionAmount = -transactionAmount
-                else:            #deposit
+                # Transact (deposit)
+                else:     
                     pass
 
-                self.atm_connection.send( ATMMessage.wrap(GET_BALANCE, 0) )
+                self.atm_connection.send(ATMMessage.wrap(PUT_BALANCE, transactionAmount))
                 balance = self.__recieveBalance__()
                 
                 if balance == SHUTDOWN:
                     break
 
-                balance += transactionAmount
-                self.atm_connection.send( ATMMessage.wrap(PUT_BALANCE, balance) )
+                #balance += transactionAmount
+                #self.atm_connection.send( ATMMessage.wrap(PUT_BALANCE, balance))
 
-                print ( self.clientName + ' transaction for: ' + str(transactionAmount) + ', balance of: ' + str(balance) + '\n', end = ''  )
+                print(self.clientName + ' transaction for: ' + str(transactionAmount) + ', balance of: ' + str(balance) + '\n', end = '')
                 self.transactionTotal += transactionAmount
 
-
         print('   ATM machine', self.clientName, 'shutting down; transaction total was:', self.transactionTotal )
-        
-
  
     def __recieveBalance__(self):
         '''returns EXIT to indicate a shutdown was recieved, returns the balance otherwise'''

@@ -1,11 +1,10 @@
-#
-# ATMServer.py
-# CS3070 Synchronization Lab series 
-#
-# created: Spring '16
-# updated: 13 Jan 2022
-#
+'''
+ATMServer.py
+CS3070: Gohlwar, Goohs, Norman 
 
+Created: Spring '16
+Updated: 13 Jan 2022
+'''
 
 import random
 import time
@@ -15,8 +14,6 @@ import SL_Kernel as Kernel
 from Semaphore import *
 from ATMMessage import *
 
-
-
 '''This is bank's ATM server class.
 There are multiples of these running at the bank which may access the same accounts at the same time. It
 does not matter if we think of them running on the same huge machine or many little ones, the data is shared.
@@ -25,7 +22,6 @@ It does not matter if the data is shared inside a database, a data structure, in
 RAM, or in a sandard RAM.  Shared is shared and essentially the only thing that changes is timing.
 '''
 class ATMServer(mp.Process):
-
 
 ##########################################
 #Constructor
@@ -46,12 +42,8 @@ class ATMServer(mp.Process):
         self.again = True
         self.seed = seed
         
-
-        
-
 ##########################################
 #Instance Methods
-
 
     def execute(self, q, al, ml, n):
         '''this is the function which serves as the processes "Run loop" '''
@@ -73,51 +65,36 @@ class ATMServer(mp.Process):
             message = self.atm_connection.recv()
             (operation, amount) = ATMMessage.unwrap(message)
 
-            """
             self.semaphore.wait(self)
             self.atmTransaction(operation, amount)
             self.semaphore.signal(self)
-            """
 
-            if operation == PUT_BALANCE:
-                self.semaphore.wait(self) # Update
-                self.putBalance(amount)
-                self.semaphore.signal(self) # Update
-                
-            elif operation == GET_BALANCE:
-                self.semaphore.wait(self) # Update
-                amount = self.getBalance()
-                self.semaphore.signal(self) # Update
-                msg = ATMMessage.wrap(BALANCE, amount)
-                self.atm_connection.send(msg)
-            else:
-                raise RuntimeError(operation + 'is an unrecognized account operation')
-       
         self.atm_connection.send(SHUTDOWN)   #tell ATM to shutdown
         print('   ATMServer', self.clientName, 'shut down')
         self.OS.completeShutDown()
 
+    """
     def getBalance(self):
         return self.OS.read(self.account)
 
     def putBalance(self, newBalance):
         self.OS.write(self.account, newBalance)
+    """
 
-    """
-    Still working, transaction protocol combining put and get
     def atmTransaction(self, operation, amount):
-        #self.semaphore.wait(self)
-        if operation == PUT_BALANCE:
-            self.OS.write(self.account, amount)
-                
-        elif operation == GET_BALANCE:
-            amount = self.OS.read(self.account)
-            msg = ATMMessage.wrap(BALANCE, amount)
-            self.atm_connection.send(msg)
-        else:
-            raise RuntimeError(operation + 'is an unrecognized account operation')
-        #self.semaphore.signal(self)
-    """
+        # Read current balance
+        currentBal = self.OS.read(self.account)
+
+        # Get balance
+        if operation == GET_BALANCE:
+            msg = ATMMessage.wrap(BALANCE, currentBal)
+        # Transaction -> Modify current balance
+        elif operation == PUT_BALANCE:
+            newBal = currentBal + amount
+            self.OS.write(self.account, newBal)
+            msg = ATMMessage.wrap(BALANCE, newBal)
+        # Send message back to caller (get or put)
+        self.atm_connection.send(msg)
 
     def __initializeSimComponents(self, q, al):
         self.OS.SIM_SETUP_setUpKernel(q, al, self.name)
@@ -125,13 +102,11 @@ class ATMServer(mp.Process):
         self.OS.p = self
 
         self.OS.al = self.OS.Lock(self.OS)
-        self.OS.read(self.account)                    #verify we are connected to proper memory
-
+        self.OS.read(self.account) #verify we are connected to proper memory
 
     def getName(self):
         ''' returns the string that is the name of thie UserProcess'''
         return self.name
-
 
     def start(self):
         ''' This is how we get Python to run our custom code in a process.
@@ -144,29 +119,20 @@ class ATMServer(mp.Process):
         '''
         super().start()
 
-
     def join(self):
         ''' Send a message to parent calling this when complete, parent will wait until all joining
             children have completed before progressing past join barrier. '''
         super().join() 
-
-
 
     def sleep(self):
         '''puts thread into wait state'''
         #print('      calling for sleep (via wait) on', self.name)
         self.flag.wait()
 
-
     def wake(self):
         '''puts thread back into running state '''
         self.flag.set()   #wake the process' thread up
 
-
     def slp_yield(self):
         '''tells scheduler to take thread off CPU and put into ready queue'''
         self.flag.wait(0.0001)
-        
-
-
-
