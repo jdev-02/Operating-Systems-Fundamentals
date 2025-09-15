@@ -73,20 +73,21 @@ class ATMServer(mp.Process):
             message = self.atm_connection.recv()
             (operation, amount) = ATMMessage.unwrap(message)
 
+            """
+            self.semaphore.wait(self)
+            self.atmTransaction(operation, amount)
+            self.semaphore.signal(self)
+            """
+
             if operation == PUT_BALANCE:
                 self.semaphore.wait(self) # Update
-                try:
-                    self.putBalance(amount)
-                # write shared state
-                finally:
-                    self.semaphore.signal(self) # Update 
+                self.putBalance(amount)
+                self.semaphore.signal(self) # Update
                 
             elif operation == GET_BALANCE:
                 self.semaphore.wait(self) # Update
-                try:
-                    amount = self.getBalance()
-                finally:
-                    self.semaphore.signal(self) # Update
+                amount = self.getBalance()
+                self.semaphore.signal(self) # Update
                 msg = ATMMessage.wrap(BALANCE, amount)
                 self.atm_connection.send(msg)
             else:
@@ -96,12 +97,27 @@ class ATMServer(mp.Process):
         print('   ATMServer', self.clientName, 'shut down')
         self.OS.completeShutDown()
 
-
     def getBalance(self):
         return self.OS.read(self.account)
 
     def putBalance(self, newBalance):
         self.OS.write(self.account, newBalance)
+
+    """
+    Still working, transaction protocol combining put and get
+    def atmTransaction(self, operation, amount):
+        #self.semaphore.wait(self)
+        if operation == PUT_BALANCE:
+            self.OS.write(self.account, amount)
+                
+        elif operation == GET_BALANCE:
+            amount = self.OS.read(self.account)
+            msg = ATMMessage.wrap(BALANCE, amount)
+            self.atm_connection.send(msg)
+        else:
+            raise RuntimeError(operation + 'is an unrecognized account operation')
+        #self.semaphore.signal(self)
+    """
 
     def __initializeSimComponents(self, q, al):
         self.OS.SIM_SETUP_setUpKernel(q, al, self.name)

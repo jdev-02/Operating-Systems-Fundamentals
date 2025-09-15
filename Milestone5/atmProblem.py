@@ -60,6 +60,7 @@ if __name__ == '__main__':
     #message = ATMMessage.wrap(operation, amount)
     #mySem = Semaphore(n, OS)
     #operation, amount = ATMMessage.unwrap(message)
+    # From either P3 or P4 to P1 or P2 -> msg(amount)
 
     # 2. updatestuffinsharedresource(acct#)
 
