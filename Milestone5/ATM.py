@@ -58,12 +58,8 @@ class ATM(mp.Process):
 
             # Check balance
             if pull < 0.2: 
-                #self.atm_connection.send(ATMMessage.wrap(GET_BALANCE, 0))
+                # Set transactionAmount to 0 -> just checking balance
                 transactionAmount = 0
-                #balance = self.__recieveBalance__()
-                #if balance == SHUTDOWN:
-                #    break
-                #print ( self.clientName + ' balance inquiry: ' + str(balance) + '\n', end = ''  )
 
             else:
                 # Transact (withdraw)
@@ -72,15 +68,13 @@ class ATM(mp.Process):
                 # Transact (deposit)
                 else:     
                     pass
-
+            
+            # Send one message to server (withdrawal, deposit, or query)
             self.atm_connection.send(ATMMessage.wrap(PUT_BALANCE, transactionAmount))
             balance = self.__recieveBalance__()
                 
             if balance == SHUTDOWN:
                 break
-
-            #balance += transactionAmount
-            #self.atm_connection.send( ATMMessage.wrap(PUT_BALANCE, balance))
 
             print(self.clientName + ' transaction for: ' + str(transactionAmount) + ', balance of: ' + str(balance) + '\n', end = '')
             self.transactionTotal += transactionAmount
