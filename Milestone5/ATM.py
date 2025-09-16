@@ -58,11 +58,12 @@ class ATM(mp.Process):
 
             # Check balance
             if pull < 0.2: 
-                self.atm_connection.send(ATMMessage.wrap(GET_BALANCE, 0))
-                balance = self.__recieveBalance__()
-                if balance == SHUTDOWN:
-                    break
-                print ( self.clientName + ' balance inquiry: ' + str(balance) + '\n', end = ''  )
+                #self.atm_connection.send(ATMMessage.wrap(GET_BALANCE, 0))
+                transactionAmount = 0
+                #balance = self.__recieveBalance__()
+                #if balance == SHUTDOWN:
+                #    break
+                #print ( self.clientName + ' balance inquiry: ' + str(balance) + '\n', end = ''  )
 
             else:
                 # Transact (withdraw)
@@ -72,17 +73,17 @@ class ATM(mp.Process):
                 else:     
                     pass
 
-                self.atm_connection.send(ATMMessage.wrap(PUT_BALANCE, transactionAmount))
-                balance = self.__recieveBalance__()
+            self.atm_connection.send(ATMMessage.wrap(PUT_BALANCE, transactionAmount))
+            balance = self.__recieveBalance__()
                 
-                if balance == SHUTDOWN:
-                    break
+            if balance == SHUTDOWN:
+                break
 
-                #balance += transactionAmount
-                #self.atm_connection.send( ATMMessage.wrap(PUT_BALANCE, balance))
+            #balance += transactionAmount
+            #self.atm_connection.send( ATMMessage.wrap(PUT_BALANCE, balance))
 
-                print(self.clientName + ' transaction for: ' + str(transactionAmount) + ', balance of: ' + str(balance) + '\n', end = '')
-                self.transactionTotal += transactionAmount
+            print(self.clientName + ' transaction for: ' + str(transactionAmount) + ', balance of: ' + str(balance) + '\n', end = '')
+            self.transactionTotal += transactionAmount
 
         print('   ATM machine', self.clientName, 'shutting down; transaction total was:', self.transactionTotal )
  

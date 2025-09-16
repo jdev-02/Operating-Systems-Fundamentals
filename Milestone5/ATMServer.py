@@ -66,7 +66,7 @@ class ATMServer(mp.Process):
             (operation, amount) = ATMMessage.unwrap(message)
 
             self.semaphore.wait(self)
-            self.atmTransaction(operation, amount)
+            self.atmTransaction(amount)
             self.semaphore.signal(self)
 
         self.atm_connection.send(SHUTDOWN)   #tell ATM to shutdown
@@ -81,15 +81,15 @@ class ATMServer(mp.Process):
         self.OS.write(self.account, newBalance)
     """
 
-    def atmTransaction(self, operation, amount):
+    def atmTransaction(self, amount):
         # Read current balance
         currentBal = self.OS.read(self.account)
 
         # Get balance
-        if operation == GET_BALANCE:
+        if amount == 0:
             msg = ATMMessage.wrap(BALANCE, currentBal)
         # Transaction -> Modify current balance
-        elif operation == PUT_BALANCE:
+        elif amount != 0:
             newBal = currentBal + amount
             self.OS.write(self.account, newBal)
             msg = ATMMessage.wrap(BALANCE, newBal)
