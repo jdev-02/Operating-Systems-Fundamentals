@@ -1,6 +1,6 @@
 Milestone 2
-Raajpaal Gohlwar (Capt - USMC)
-Jonathan Goohs (LT - USN)
+Raajpaal  (Capt - USMC)
+[author] (LT - USN)
 Tamarcus Norma (LT - USN)
 ----------------------------------------------------------------------------------------------------
 D1 - Provide an annotated output of a run indicating the place(s) where you see evidence of improper
