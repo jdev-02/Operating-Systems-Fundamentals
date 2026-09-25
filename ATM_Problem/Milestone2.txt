@@ -1,7 +1,7 @@
 Milestone 2
-Raajpaal  (Capt - USMC)
+[teammate] (Capt - USMC)
 [author] (LT - USN)
-Tamarcus Norma (LT - USN)
+[teammate] (LT - USN)
 ----------------------------------------------------------------------------------------------------
 D1 - Provide an annotated output of a run indicating the place(s) where you see evidence of improper
 results. [2 pts]
